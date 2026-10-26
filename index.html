@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CARTA 60 — 60% mechanical keyboard</title>
+<meta name="description" content="A 60% mechanical keyboard in beige PBT and off-white aluminium. Machined, damped, deliberate.">
+
+<meta property="og:title" content="CARTA 60">
+<meta property="og:description" content="Beige PBT. Off-white aluminium. Sixty keys, nothing spare.">
+<meta property="og:type" content="website">
+<!-- Social scrapers require an ABSOLUTE og:image URL — a relative path is
+     silently ignored by most of them. Replace the host below with the live
+     domain once it is known; everything else on the page works regardless. -->
+<meta property="og:image" content="https://carta-60.netlify.app/assets/hero/og-share.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CARTA 60">
+<meta name="twitter:description" content="Beige PBT. Off-white aluminium. Sixty keys, nothing spare.">
+<meta name="twitter:image" content="https://carta-60.netlify.app/assets/hero/og-share.webp">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+
+<!-- The hero still gates the loader handoff, so it is fetched at highest
+     priority. Assembly frames deliberately are not preloaded here — loader.js
+     requests them so their progress can be measured. `media` keeps a phone
+     from pulling the 2400px version alongside the 1200. -->
+<link rel="preload" as="image" href="assets/hero/hero.webp" fetchpriority="high" media="(min-width: 769px)">
+<link rel="preload" as="image" href="assets/hero/hero@1200.webp" fetchpriority="high" media="(max-width: 768px)">
+
+<!-- Three.js is vendored, like GSAP, so nothing is fetched from a CDN. The
+     addons under vendor/three/jsm/ import the bare specifier "three", which
+     only resolves through an import map — and the map must be declared before
+     any module script runs. Declaring it costs nothing: it is a resolution
+     rule, not a fetch. js/viewer.js imports "three" dynamically, so the
+     ~750 KB is only pulled once the visitor nears the 3D section. -->
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.min.js" } }
+</script>
+</head>
+
+<body>
+
+<!-- ── Loading screen ─────────────────────────────────────────────────────
+     Progress is driven by real decode completion in loader.js. -->
+<div class="loader" data-loader role="status" aria-live="polite">
+  <div class="loader__inner">
+    <span class="loader__mark">CARTA</span>
+    <div class="loader__track"><div class="loader__bar" data-loader-bar></div></div>
+  </div>
+</div>
+
+
+<!-- ── Nav rail ──────────────────────────────────────────────────────────-->
+<nav class="rail" aria-label="Sections">
+  <ul class="rail__list">
+    <li><a class="rail__link" data-nav-link href="#overview">Overview</a></li>
+    <li><a class="rail__link" data-nav-link href="#inside">Inside</a></li>
+    <!-- initNavRail() in js/ui.js picks up any [data-nav-link] and wires the
+         scroll-linked active state from its href, so a new rail item needs no
+         JS change at all. -->
+    <li><a class="rail__link" data-nav-link href="#interactive">Interactive 3D</a></li>
+    <li><a class="rail__link" data-nav-link href="#switches">Switches</a></li>
+    <li><a class="rail__link" data-nav-link href="#specs">Specs</a></li>
+    <li><a class="rail__link" data-nav-link href="#access">Access</a></li>
+  </ul>
+</nav>
+
+
+<main>
+
+  <!-- ── Hero ────────────────────────────────────────────────────────────-->
+  <section class="hero" id="overview">
+    <div class="hero__copy">
+      <h1 class="hero__title">Sixty keys.<br>Nothing spare.</h1>
+      <p class="hero__product">CARTA 60</p>
+      <p class="hero__sub">Beige PBT on machined off-white aluminium.</p>
+
+      <!-- One conversion point on the page, stated first. "Explore" is
+           deliberately the quieter of the two: it is navigation, not an
+           a competing ask. -->
+      <div class="pills">
+        <button class="pill pill--solid" data-pill="access" type="button">Request early access</button>
+        <button class="pill" data-pill="explore" type="button">Explore</button>
+      </div>
+    </div>
+
+    <div class="hero__media" data-hero-media>
+      <img
+        src="assets/hero/hero.webp"
+        srcset="assets/hero/hero@1200.webp 1200w, assets/hero/hero.webp 2400w"
+        sizes="(max-width: 900px) 100vw, 60vw"
+        width="2400" height="1309"
+        alt="CARTA 60 keyboard, beige keycaps in an off-white aluminium case, seen from the front.">
+    </div>
+  </section>
+
+
+  <!-- ── Scroll assembly (centrepiece) ───────────────────────────────────
+       Pinned by ScrollTrigger; the canvas is scrubbed frame-by-frame. -->
+  <section class="assembly" id="inside" data-assembly>
+    <div class="assembly__stage">
+      <canvas class="assembly__canvas" data-assembly-canvas
+              role="img"
+              aria-label="The CARTA 60 assembling from its component parts as you scroll."></canvas>
+
+      <header class="assembly__head">
+        <h2 class="assembly__title">Every part<br>accounted for.</h2>
+      </header>
+
+      <p class="assembly__cue">
+        <span class="assembly__cue-line"></span>
+        Scroll to assemble
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ── Interactive 3D ──────────────────────────────────────────────────
+       The only real-time element on the page. Sits directly after the
+       assembly scrub: that section shows you the parts going together, this
+       one hands you the result. Everything inside the frame is inert until
+       js/viewer.js lazily boots it on approach. -->
+  <section class="viewer" id="interactive" data-viewer>
+    <div class="viewer__copy" data-reveal>
+      <h2 class="viewer__title">Turn it<br>over.</h2>
+      <p>No renders here. This one is the real thing, running in your browser.</p>
+      <p class="viewer__cue">
+        <span class="viewer__cue-line"></span>
+        Drag to rotate, scroll/pinch to zoom
+      </p>
+    </div>
+
+    <div class="viewer__frame" data-viewer-frame>
+      <canvas class="viewer__canvas" data-viewer-canvas
+              role="img"
+              aria-label="An interactive 3D model of the CARTA 60. Drag to rotate it, scroll or pinch to zoom."></canvas>
+
+      <!-- Progress, driven by the GLTFLoader's real byte counts. -->
+      <div class="viewer__loading" data-viewer-loading role="status" aria-live="polite">
+        <div class="viewer__track"><div class="viewer__bar" data-viewer-bar></div></div>
+      </div>
+
+      <!-- Shown for no-WebGL and for a failed model fetch. Never a blank box. -->
+      <div class="viewer__fallback">
+        <img src="assets/model/poster.webp" alt="The CARTA 60 seen from a three-quarter angle."
+             loading="lazy" decoding="async">
+        <p class="viewer__error" data-viewer-error></p>
+      </div>
+
+      <div class="viewer__zoom">
+        <button type="button" data-viewer-zoom="in"  aria-label="Zoom in">+</button>
+        <button type="button" data-viewer-zoom="out" aria-label="Zoom out">−</button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ── Detail sections ─────────────────────────────────────────────────-->
+  <section class="detail" id="switches">
+    <figure class="detail__media" data-reveal>
+      <img src="assets/detail/detail-01.webp" loading="lazy" decoding="async"
+           width="1800" height="982"
+           alt="A single switch with its keycap lifted away, showing the stem and housing.">
+    </figure>
+    <div class="detail__copy" data-reveal>
+      <h2 class="detail__title">Tactile,<br>not loud.</h2>
+      <p>Factory-lubed stems on a gasket-mounted plate. No ping, no hollow.</p>
+    </div>
+  </section>
+
+  <section class="detail detail--flip">
+    <figure class="detail__media" data-reveal>
+      <img src="assets/detail/detail-02.webp" loading="lazy" decoding="async"
+           width="1800" height="982"
+           alt="The CARTA 60 from directly above, showing the full 61-key layout.">
+    </figure>
+    <div class="detail__copy" data-reveal>
+      <h2 class="detail__title">Legends that<br>outlive the board.</h2>
+      <p>Dye-sublimated PBT, 1.5 mm walls. Nothing printed on, nothing to wear off.</p>
+    </div>
+  </section>
+
+  <section class="detail" id="specs">
+    <figure class="detail__media" data-reveal>
+      <img src="assets/detail/detail-03.webp" loading="lazy" decoding="async"
+           width="1800" height="982"
+           alt="The keyboard in profile, showing the low wedge of the aluminium case.">
+    </figure>
+    <div class="detail__copy" data-reveal>
+      <h2 class="detail__title">One block<br>of aluminium.</h2>
+      <p>Cut from 6063 billet, bead-blasted, anodised to a flat off-white.</p>
+    </div>
+  </section>
+
+  <!-- ── Early access ────────────────────────────────────────────────────
+       The page's only conversion point. Netlify detects this form by parsing
+       the DEPLOYED HTML for data-netlify, which is why the markup is static
+       here rather than built by JS — a JS-constructed form is invisible to
+       that scan and its POSTs are rejected with a 404.
+
+       js/form.js takes over submit so the visitor never leaves the page;
+       without JS the form still posts natively to Netlify and lands on its
+       default success page, so this degrades rather than breaks. -->
+  <section class="access" id="access">
+    <div class="access__copy" data-reveal>
+      <h2 class="access__title">Be first<br>in line.</h2>
+      <p>The first run is small. Leave your details and we'll come to you before it opens.</p>
+      <p class="access__cue">
+        <span class="access__cue-line"></span>
+        Replies within 24 hours
+      </p>
+    </div>
+
+    <div class="access__panel" data-reveal>
+      <form class="form" name="early-access" method="POST"
+            data-netlify="true" data-netlify-honeypot="bot-field"
+            data-access-form>
+
+        <!-- Netlify routes a POST by this field, not by the URL. FormData
+             picks it up automatically, so js/form.js assembles nothing. -->
+        <input type="hidden" name="form-name" value="early-access">
+
+        <!-- Honeypot. A real, reachable input that no human sees; Netlify
+             silently discards any submission that fills it. -->
+        <p class="form__hp" aria-hidden="true">
+          <label>Don't fill this in <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+        </p>
+
+        <div class="field" data-field="name">
+          <label for="f-name">Name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name"
+                 required aria-describedby="err-name">
+          <p class="field__error" id="err-name" data-field-error></p>
+        </div>
+
+        <div class="field" data-field="email">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" autocomplete="email"
+                 required aria-describedby="err-email">
+          <p class="field__error" id="err-email" data-field-error></p>
+        </div>
+
+        <div class="field" data-field="message">
+          <label for="f-message">What are you looking for?</label>
+          <textarea id="f-message" name="message" rows="4"
+                    required aria-describedby="err-message"></textarea>
+          <p class="field__error" id="err-message" data-field-error></p>
+        </div>
+
+        <div class="form__actions">
+          <button class="pill pill--solid" type="submit" data-form-submit>Request early access</button>
+        </div>
+
+        <p class="form__status" data-form-status role="status" aria-live="polite"></p>
+      </form>
+
+      <!-- [hidden] rather than a JS-applied class: the success state is never
+           painted before scripts run, so there is no flash of it. -->
+      <div class="form__done" data-form-done hidden>
+        <p class="form__done-head" tabindex="-1" data-form-done-head>Thanks — we'll be in touch.</p>
+        <p>We typically respond within 24 hours. Nothing else lands in your inbox.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Second and last placement of the same CTA, pointing at the same form.
+       Nothing else on the page asks the visitor for anything. -->
+  <aside class="closer" data-closer data-reveal>
+    <p class="closer__line">Sixty keys, a small first run, and a short list.</p>
+    <button class="pill pill--solid" data-pill="access" type="button">Request early access</button>
+  </aside>
+
+
+  <footer class="foot" data-reveal>
+    <p class="foot__mark">CARTA 60</p>
+    <p class="foot__note">CARTA 60 — a skills showcase. Built to demonstrate design and engineering process, not a commercial product.</p>
+  </footer>
+
+</main>
+
+<!-- GSAP is vendored rather than loaded from a CDN so the page works offline
+     and there is no third-party request on the critical path. -->
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script type="module" src="js/main.js"></script>
+
+</body>
+</html>

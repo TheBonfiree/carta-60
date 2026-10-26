@@ -1,0 +1,82 @@
+/* ---------------------------------------------------------------------------
+ * base.css — reset, tokens, typography
+ * ------------------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+img, canvas { display: block; max-width: 100%; }
+img { height: auto; }
+button { font: inherit; color: inherit; background: none; border: 0; }
+
+:root {
+  /* Palette — warm off-white ground, product tones, near-black text.
+     One accent only: a desaturated sand that sits inside the product's own
+     colour range rather than fighting it. */
+  --c-bg:        #f4f2ee;
+  --c-keycap:    #e8e0d2;
+  --c-case:      #faf9f6;
+  --c-ink:       #141414;
+  --c-ink-soft:  #6b6862;
+  --c-line:      #ddd8cf;
+  --c-accent:    #b8a888;
+
+  /* Type. No webfonts: Bahnschrift (Windows) and Helvetica Neue Condensed
+     (macOS) both give a real condensed display face with zero network cost
+     and no FOUT. font-stretch drives the fallbacks that support it. */
+  --f-display: 'Bahnschrift', 'Helvetica Neue', 'Arial Narrow', system-ui, sans-serif;
+  --f-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+  /* Fluid scale — clamps rather than breakpoints, so headlines stay
+     proportional without a cascade of media queries. */
+  --t-hero:   clamp(3.25rem, 9vw, 8.5rem);
+  --t-title:  clamp(2.5rem, 6vw, 5.5rem);
+  --t-body:   clamp(1rem, 1.15vw, 1.1875rem);
+
+  /* Generous, consistent negative space. */
+  --s-gutter: clamp(1.5rem, 6vw, 8rem);
+  --s-section: clamp(7rem, 18vh, 14rem);
+}
+
+html { scroll-behavior: auto; }
+
+body {
+  background: var(--c-bg);
+  color: var(--c-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* The page sits under the loading screen until decode completes. */
+main { opacity: 0; transition: opacity .7s ease; }
+.is-loaded main { opacity: 1; }
+
+h1, h2 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-stretch: condensed;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+  text-transform: none;
+  text-wrap: balance;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Visible focus everywhere — the accent is used here precisely because it is
+   used almost nowhere else. */
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

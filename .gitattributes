@@ -1,0 +1,7 @@
+# Pin line endings so a Windows clone does not rewrite text files.
+* text=auto eol=lf
+
+*.webp binary
+*.png  binary
+*.mp4  binary
+*.glb  binary

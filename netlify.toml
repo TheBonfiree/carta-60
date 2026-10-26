@@ -1,0 +1,53 @@
+# Netlify configuration. Honoured by drag-and-drop (zip) deploys as well as
+# git-connected ones.
+#
+# There is no build step — the site is served exactly as committed.
+
+[build]
+  publish = "."
+  command = ""
+
+# Serverless functions live here. submit-lead.js pushes each lead into Airtable
+# server-side, keeping the Airtable token out of the frontend. Dependency-free,
+# so no bundling step is required on this no-build site.
+[functions]
+  directory = "netlify/functions"
+
+# The assembly frames are the bulk of the payload and are fetched 97 at a time,
+# so caching them matters more than anything else here. Filenames are NOT
+# content-hashed (frame_0000.webp keeps its name across rebuilds), so this is a
+# 30-day cache rather than immutable — long enough to make repeat visits free,
+# short enough that a re-render propagates without a cache-buster.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+# Code and markup are unhashed too, so they must revalidate or a deploy would
+# leave visitors on a stale page pointing at changed assets.
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# GSAP is versioned and vendored — it will not change without a filename change.
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

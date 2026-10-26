@@ -1,0 +1,305 @@
+/* ---------------------------------------------------------------------------
+ * layout.css — section scaffolding, nav rail, whitespace rhythm
+ * ------------------------------------------------------------------------- */
+
+/* ── Nav rail ──────────────────────────────────────────────────────────────
+   Fixed to the right edge, vertical, quiet until active. */
+.rail {
+  position: fixed;
+  top: 50%;
+  right: var(--s-gutter);
+  transform: translateY(-50%);
+  z-index: 40;
+  opacity: 0;
+  transition: opacity .8s ease .3s;
+}
+.is-loaded .rail { opacity: 1; }
+
+.rail__list { list-style: none; padding: 0; display: grid; gap: 1.15rem; text-align: right; }
+
+.rail__link {
+  display: inline-block;
+  font-size: .6875rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+  /* Transform + opacity only — no width/margin animation. */
+  transition: color .35s ease, transform .35s ease, opacity .35s ease;
+  opacity: .55;
+}
+.rail__link:hover { opacity: 1; color: var(--c-ink); }
+.rail__link.is-active {
+  color: var(--c-ink);
+  opacity: 1;
+  transform: translateX(-.35rem);
+}
+
+@media (max-width: 900px) { .rail { display: none; } }
+
+
+/* ── Hero ──────────────────────────────────────────────────────────────────*/
+.hero {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 6rem);
+  padding: clamp(6rem, 12vh, 9rem) var(--s-gutter) var(--s-section);
+}
+
+.hero__title { font-size: var(--t-hero); }
+
+.hero__product {
+  margin-top: clamp(1.75rem, 3vw, 2.75rem);
+  font-family: var(--f-display);
+  font-stretch: condensed;
+  font-size: .875rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--c-ink);
+}
+
+.hero__sub {
+  margin-top: .5rem;
+  max-width: 34ch;
+  color: var(--c-ink-soft);
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: clamp(5rem, 14vh, 8rem);
+  }
+  .hero__media { order: -1; }
+}
+
+
+/* ── Assembly (pinned) ─────────────────────────────────────────────────────*/
+.assembly {
+  height: 100svh;
+  position: relative;
+  overflow: hidden;
+}
+
+.assembly__stage {
+  position: relative;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  padding: var(--s-gutter);
+}
+
+.assembly__canvas {
+  width: 100%;
+  height: 100%;
+  /* The canvas paints its own matching ground, so no seam at the letterbox. */
+  background: var(--c-bg);
+}
+
+.assembly__head {
+  position: absolute;
+  top: clamp(3rem, 10vh, 7rem);
+  left: var(--s-gutter);
+  pointer-events: none;
+}
+.assembly__title { font-size: var(--t-title); }
+
+/* Reduced motion: the section is unpinned and simply shows the final frame. */
+.assembly.is-static .assembly__cue { display: none; }
+
+
+/* ── Detail sections ───────────────────────────────────────────────────────*/
+.detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 7rem);
+  padding: var(--s-section) var(--s-gutter);
+}
+
+/* Alternate the image side without touching source order. */
+.detail--flip .detail__media { order: 2; }
+
+.detail__title { font-size: var(--t-title); }
+
+.detail__copy p {
+  margin-top: 1.25rem;
+  max-width: 36ch;
+  color: var(--c-ink-soft);
+}
+
+@media (max-width: 900px) {
+  .detail { grid-template-columns: 1fr; }
+  .detail--flip .detail__media { order: 0; }
+}
+
+
+/* ── Interactive 3D ────────────────────────────────────────────────────────
+   Same left-headline / right-visual rhythm and the same column proportions as
+   .detail, so the one live section sits in the page's existing cadence rather
+   than announcing itself as a different kind of block. */
+.viewer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 7rem);
+  padding: var(--s-section) var(--s-gutter);
+}
+
+/* The nav rail is fixed over the right gutter. Elsewhere that is harmless —
+   it floats above bleeding photography — but this frame has a visible border
+   and interactive controls in exactly that corner, so the rail would both
+   collide with it and sit over a drag target. Reserve the rail's column. */
+@media (min-width: 901px) {
+  .viewer { padding-right: calc(var(--s-gutter) + 6rem); }
+}
+
+.viewer__title { font-size: var(--t-title); }
+
+.viewer__copy p {
+  margin-top: 1.25rem;
+  max-width: 36ch;
+  color: var(--c-ink-soft);
+}
+
+/* Interaction hint. Same type treatment as the scroll cue on the assembly
+   section — it is the same class of instruction, so it reads the same. */
+/* Selector is scoped rather than bare so it outranks `.viewer__copy p` below —
+   that rule's 36ch measure is for prose, and at this size with .22em tracking
+   it broke a one-line instruction across three. */
+.viewer__copy .viewer__cue {
+  margin-top: 1.75rem;
+  max-width: none;
+  display: flex;
+  align-items: center;
+  gap: .875rem;
+  font-size: .6875rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+
+.viewer__cue-line {
+  width: 46px;
+  height: 1px;
+  background: var(--c-line);
+  flex: none;
+}
+
+@media (max-width: 900px) {
+  .viewer { grid-template-columns: 1fr; }
+  /* Visual first on narrow screens, matching .hero__media's order flip. */
+  .viewer__frame { order: -1; }
+}
+
+
+/* ── Early access ──────────────────────────────────────────────────────────
+   Same column proportions and padding as .detail and .viewer. The one place
+   the page asks for something should not also be the one place that changes
+   shape — it reads as part of the argument, not as an interruption in it. */
+.access {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 7rem);
+  padding: var(--s-section) var(--s-gutter);
+}
+
+/* The nav rail is fixed over the right gutter and this section's right column
+   holds focusable controls, so reserve the rail's column exactly as .viewer
+   does rather than letting the rail sit over a text input. */
+@media (min-width: 901px) {
+  .access { padding-right: calc(var(--s-gutter) + 6rem); }
+}
+
+.access__title { font-size: var(--t-title); }
+
+.access__copy p {
+  margin-top: 1.25rem;
+  max-width: 36ch;
+  color: var(--c-ink-soft);
+}
+
+/* Same treatment as the scroll and drag cues — it is the same class of small
+   supporting line, so it reads the same. Scoped to outrank the 36ch measure
+   above, which is for prose and breaks a tracked one-liner across three. */
+.access__copy .access__cue {
+  margin-top: 1.75rem;
+  max-width: none;
+  display: flex;
+  align-items: center;
+  gap: .875rem;
+  font-size: .6875rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+
+.access__cue-line {
+  width: 46px;
+  height: 1px;
+  background: var(--c-line);
+  flex: none;
+}
+
+@media (max-width: 900px) {
+  .access { grid-template-columns: 1fr; }
+  /* Copy stays first here, unlike .hero and .viewer: the ask has to be
+     justified before the fields are worth showing. */
+}
+
+
+/* ── Closing CTA ───────────────────────────────────────────────────────────
+   The second and final placement of the one call to action. */
+.closer {
+  padding: 0 var(--s-gutter) var(--s-section);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+/* `display` outranks the [hidden] attribute's UA rule, so this is required for
+   form.js to be able to retire the band after a successful submit. Same trap
+   as .form / .form__done in components.css. */
+.closer[hidden] { display: none; }
+
+/* Same reservation as .viewer and .access. The rail is fixed to the vertical
+   middle of the viewport, so anything right-aligned into the gutter passes
+   underneath it while scrolling — and here that is the CTA itself, which would
+   put nav links on top of the page's one conversion target. */
+@media (min-width: 901px) {
+  .closer { padding-right: calc(var(--s-gutter) + 6rem); }
+}
+
+.closer__line {
+  font-family: var(--f-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  max-width: 22ch;
+}
+
+
+/* ── Footer ────────────────────────────────────────────────────────────────*/
+.foot {
+  padding: var(--s-section) var(--s-gutter) clamp(3rem, 8vh, 6rem);
+  border-top: 1px solid var(--c-line);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.foot__mark {
+  font-family: var(--f-display);
+  font-stretch: condensed;
+  letter-spacing: .3em;
+  font-size: .8125rem;
+  text-transform: uppercase;
+}
+
+.foot__note { color: var(--c-ink-soft); font-size: .8125rem; }

@@ -1,0 +1,375 @@
+/* ---------------------------------------------------------------------------
+ * components.css — loader, pills, cue, media treatments
+ * ------------------------------------------------------------------------- */
+
+/* ── Loading screen ────────────────────────────────────────────────────────*/
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--c-bg);
+  display: grid;
+  place-items: center;
+  transition: opacity .7s ease;
+}
+.loader.is-complete { opacity: 0; pointer-events: none; }
+
+.loader__inner { display: grid; gap: 1.75rem; justify-items: center; }
+
+.loader__mark {
+  font-family: var(--f-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: .42em;
+  /* Optical correction for the trailing letter-space. */
+  text-indent: .42em;
+}
+
+.loader__track {
+  width: clamp(140px, 22vw, 260px);
+  height: 1px;
+  background: var(--c-line);
+  overflow: hidden;
+}
+
+/* Driven by transform, not width — the bar animates on the compositor and
+   never triggers layout, even at 120 discrete steps. */
+.loader__bar {
+  height: 100%;
+  background: var(--c-ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .25s ease-out;
+}
+
+
+/* ── Pills ─────────────────────────────────────────────────────────────────
+   Interactive elements are separated from editorial ones by fill, not hue. */
+.pills { display: flex; gap: .75rem; margin-top: clamp(2rem, 4vw, 3rem); flex-wrap: wrap; }
+
+.pill {
+  --pill-bg: transparent;
+  padding: .8125rem 1.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--c-line);
+  background: var(--pill-bg);
+  font-size: .8125rem;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: transform .3s cubic-bezier(.22,.61,.36,1),
+              background-color .3s ease,
+              border-color .3s ease,
+              color .3s ease;
+}
+
+.pill:hover { transform: translateY(-2px); border-color: var(--c-ink); }
+.pill:active { transform: translateY(0); }
+
+.pill--solid {
+  --pill-bg: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--c-bg);
+}
+.pill--solid:hover { --pill-bg: #000; }
+
+/* A pill that is mid-request reads as unavailable, so it must not also read as
+   interactive — no lift, no pointer. */
+.pill:disabled { opacity: .55; cursor: default; transform: none; }
+
+
+/* ── Hero media ────────────────────────────────────────────────────────────
+   The only motion before first scroll: a slow scale drift, GPU-composited.
+   Applied by ui.js, so reduced-motion visitors never get the class at all. */
+.hero__media img { width: 100%; }
+
+.hero__media.is-drifting img {
+  animation: drift 24s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes drift {
+  from { transform: scale(1);    }
+  to   { transform: scale(1.02); }
+}
+
+
+/* ── Scroll cue ────────────────────────────────────────────────────────────*/
+.assembly__cue {
+  position: absolute;
+  bottom: clamp(2rem, 6vh, 4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: .875rem;
+  font-size: .6875rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+  transition: opacity .5s ease;
+  pointer-events: none;
+}
+
+/* Fades once the assembly is genuinely underway (set from scroll.js). */
+.assembly.is-scrubbing .assembly__cue { opacity: 0; }
+
+.assembly__cue-line {
+  width: 46px;
+  height: 1px;
+  background: var(--c-line);
+  position: relative;
+  overflow: hidden;
+}
+.assembly__cue-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--c-ink);
+  transform-origin: left;
+  animation: sweep 2.4s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  0%        { transform: scaleX(0); transform-origin: left; }
+  45%, 55%  { transform: scaleX(1); transform-origin: left; }
+  100%      { transform: scaleX(0); transform-origin: right; }
+}
+
+
+/* ── 3D viewer ─────────────────────────────────────────────────────────────
+   The frame is a fixed-aspect stage, so the section's height is known before
+   any of the WebGL work happens. Without that, lazily inserting a canvas would
+   reflow the page underneath the visitor mid-scroll and desync every
+   ScrollTrigger on the page. */
+.viewer__frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--c-line);
+  border-radius: 4px;
+  background: var(--c-bg);
+  overflow: hidden;
+  /* Vertical page scroll still works over the canvas on touch; horizontal
+     drag goes to OrbitControls for rotation. Without this, a one-finger
+     rotate would fight the page scroll. */
+  touch-action: pan-y;
+}
+
+.viewer__canvas {
+  width: 100%;
+  height: 100%;
+  /* Faded in once framing is fully resolved, so the model is never seen
+     mid-fit or off-centre. */
+  opacity: 0;
+  transition: opacity .6s ease;
+  cursor: grab;
+}
+.viewer__frame.is-ready .viewer__canvas { opacity: 1; }
+.viewer__canvas:active { cursor: grabbing; }
+
+/* Inline progress. Same transform-driven bar as the page loader — scaleX
+   animates on the compositor and never triggers layout. */
+.viewer__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: opacity .4s ease;
+}
+.viewer__frame.is-ready .viewer__loading,
+.viewer__frame.is-failed .viewer__loading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.viewer__track {
+  width: clamp(90px, 30%, 160px);
+  height: 1px;
+  background: var(--c-line);
+  overflow: hidden;
+}
+
+.viewer__bar {
+  height: 100%;
+  background: var(--c-ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .25s ease-out;
+}
+
+/* Failure state: the poster still plus a sentence. A blank rectangle reads as
+   a broken page; this reads as a stated limitation. */
+.viewer__fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: var(--s-gutter);
+  text-align: center;
+  background: var(--c-bg);
+}
+.viewer__frame.is-failed .viewer__fallback { display: flex; }
+
+.viewer__fallback img {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+}
+
+.viewer__error {
+  font-size: .8125rem;
+  color: var(--c-ink-soft);
+  max-width: 34ch;
+}
+
+/* Zoom controls — the .pill language (hairline border, full radius, lift on
+   hover) at control scale rather than button scale. */
+.viewer__zoom {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  display: grid;
+  gap: .5rem;
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+.viewer__frame.is-ready .viewer__zoom { opacity: 1; }
+.viewer__frame.is-failed .viewer__zoom { display: none; }
+
+.viewer__zoom button {
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 999px;
+  border: 1px solid var(--c-line);
+  background: var(--c-case);
+  color: var(--c-ink);
+  font-size: .95rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform .3s cubic-bezier(.22,.61,.36,1),
+              border-color .3s ease;
+}
+.viewer__zoom button:hover { transform: translateY(-2px); border-color: var(--c-ink); }
+.viewer__zoom button:active { transform: translateY(0); }
+
+
+/* ── Form ──────────────────────────────────────────────────────────────────
+   Underlines, not boxes. A page built on generous whitespace and hairline
+   rules gains three heavy rectangles the moment inputs get full borders, and
+   they become the loudest objects on it. A single bottom rule per field is
+   enough to read as an input and keeps the section as quiet as the rest. */
+.form { display: grid; gap: clamp(1.5rem, 3vw, 2rem); }
+
+/* A `display` declaration outranks the [hidden] attribute's UA `display:none`,
+   so both the form and its success block need this or they render on top of
+   each other — the thank-you visible at rest, the form still there after a
+   successful submit. Any display: rule added below must keep this pairing. */
+.form[hidden],
+.form__done[hidden] { display: none; }
+
+.field { display: grid; gap: .4rem; }
+
+.field label {
+  font-size: .6875rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+
+.field input,
+.field textarea {
+  font: inherit;
+  color: var(--c-ink);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--c-line);
+  border-radius: 0;
+  padding: .5rem 0;
+  width: 100%;
+  transition: border-color .3s ease;
+  /* Safari gives inputs its own font and an inset shadow otherwise. */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.field textarea { resize: vertical; min-height: 6.5rem; line-height: 1.5; }
+
+.field input:hover,
+.field textarea:hover { border-color: var(--c-ink-soft); }
+
+/* The rule itself carries focus, so the global outline would double it. The
+   accent stays the focus colour, consistent with everything else. */
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--c-accent);
+  border-bottom-width: 2px;
+  /* Compensate so the baseline does not shift by 1px on focus. */
+  padding-bottom: calc(.5rem - 1px);
+}
+
+/* Errors are weight and copy, not hue. The palette has one accent and no error
+   colour; introducing a red here would be the most saturated thing on the page
+   and would out-shout the product it is meant to be selling. */
+.field.is-invalid input,
+.field.is-invalid textarea { border-color: var(--c-ink); }
+
+.field__error {
+  font-size: .75rem;
+  color: var(--c-ink);
+  min-height: 0;
+}
+.field.is-invalid .field__error { min-height: 1.2em; }
+
+/* Honeypot. Off-screen rather than display:none or hidden — bots routinely
+   skip fields they can tell are unrendered, and this one only works if they
+   fill it in. aria-hidden + tabindex="-1" keep it away from real visitors. */
+.form__hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form__actions { margin-top: .25rem; }
+
+/* Submission failure. Empty and invisible until it has something to say, so it
+   reserves no space in the resting layout. */
+.form__status:empty { display: none; }
+.form__status {
+  font-size: .8125rem;
+  color: var(--c-ink-soft);
+  padding-left: .875rem;
+  border-left: 2px solid var(--c-line);
+}
+.form__status.is-error { color: var(--c-ink); border-left-color: var(--c-accent); }
+
+/* Success. Replaces the form in the same column, so the panel does not jump. */
+.form__done { display: grid; gap: .75rem; }
+
+.form__done-head {
+  font-family: var(--f-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+}
+/* Focused programmatically to announce the change; it is not a control, so it
+   should not draw a focus ring like one. */
+.form__done-head:focus { outline: none; }
+
+.form__done p:not(.form__done-head) { color: var(--c-ink-soft); max-width: 34ch; }
+
+
+/* ── Detail media ──────────────────────────────────────────────────────────*/
+.detail__media img { width: 100%; }
+
+/* Reveals start hidden only when JS will animate them; without JS the
+   [data-reveal] elements keep their default visibility. */
