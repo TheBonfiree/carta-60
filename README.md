@@ -382,3 +382,11 @@ is hidden. Verified by counting real GL draw calls: 30/s while visible, **0** on
 ---
 
 An original design study. Not for sale.
+
+## Screenshots
+
+![Desktop — hero](screenshots/desktop.png)
+
+![Desktop — scrolled](screenshots/desktop-2.png)
+
+<img src="screenshots/mobile.png" alt="Mobile" width="320">
